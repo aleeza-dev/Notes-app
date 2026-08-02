@@ -145,7 +145,7 @@ GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
 
 GitHub: https://github.com/aleeza-dev
 
-LinkedIn: *(Add your LinkedIn profile link here)*
+LinkedIn: *https://pk.linkedin.com/in/aleeza-amjad-544379264*
 
 ---
 
