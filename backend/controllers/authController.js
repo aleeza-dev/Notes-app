@@ -1,5 +1,4 @@
 import User from "../models/User.js";
-
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
@@ -14,14 +13,12 @@ export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Please fill all fields",
       });
     }
 
-    // Check existing user
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -30,10 +27,8 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create User
     const user = await User.create({
       name,
       email,
@@ -50,10 +45,10 @@ export const signup = async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);
+    console.error("Signup Error:", error);
 
     res.status(500).json({
-      message: "Server Error",
+      message: error.message,
     });
   }
 };
@@ -66,14 +61,12 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         message: "Please fill all fields",
       });
     }
 
-    // Check User
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -82,7 +75,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Compare Password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -91,12 +83,8 @@ export const login = async (req, res) => {
       });
     }
 
-
-    // Generate JWT
     const token = jwt.sign(
-      {
-        id: user._id,
-      },
+      { id: user._id },
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
@@ -114,16 +102,24 @@ export const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);
+    console.error("Login Error:", error);
 
     res.status(500).json({
-      message: "Server Error",
+      message: error.message,
     });
   }
 };
 
+// ======================
+// Google Login
+// ======================
+
 export const googleLogin = async (req, res) => {
   try {
+    console.log("========== GOOGLE LOGIN ==========");
+    console.log("Request Body:", req.body);
+    console.log("Client ID:", process.env.GOOGLE_CLIENT_ID);
+
     const { credential } = req.body;
 
     if (!credential) {
@@ -132,7 +128,6 @@ export const googleLogin = async (req, res) => {
       });
     }
 
-    // Verify Google Token
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -140,25 +135,26 @@ export const googleLogin = async (req, res) => {
 
     const payload = ticket.getPayload();
 
+    console.log("Google Payload:", payload);
+
     const { email, name } = payload;
 
-    // Check if user exists
     let user = await User.findOne({ email });
 
-    // If not, create user
     if (!user) {
+      console.log("Creating new Google user...");
+
       user = await User.create({
         name,
         email,
-        password: "GOOGLE_LOGIN_USER",
+        password: await bcrypt.hash("GOOGLE_LOGIN_USER", 10),
       });
+    } else {
+      console.log("Existing Google user found.");
     }
 
-    // Create JWT
     const token = jwt.sign(
-      {
-        id: user._id,
-      },
+      { id: user._id },
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
@@ -176,10 +172,13 @@ export const googleLogin = async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error);
+    console.error("========== GOOGLE LOGIN ERROR ==========");
+    console.error(error);
+    console.error(error.message);
+    console.error(error.stack);
 
     res.status(500).json({
-      message: "Google Login Failed",
+      message: error.message,
     });
   }
 };
