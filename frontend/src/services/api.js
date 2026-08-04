@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://notes-app-production-40df.up.railway.app",
+  baseURL: "https://notes-app-production-40df.up.railway.app/api",
 });
 
 API.interceptors.request.use((req) => {
