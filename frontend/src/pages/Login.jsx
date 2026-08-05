@@ -88,7 +88,6 @@ const Login = () => {
 
                 navigate("/dashboard");
 
-                window.location.reload();
 
               } catch (error) {
                 console.error("Google Login Error:", error);
