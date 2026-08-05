@@ -35,8 +35,6 @@ const Login = () => {
 
       navigate("/dashboard");
 
-      window.location.reload();
-
     } catch (err) {
       console.error("Login Error:", err);
       console.error("Response:", err.response);
