@@ -14,8 +14,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://notes-app-iota-eight-43.vercel.app",
-       "https://notes-9bpyxzg4b-aleeza-amjads-projects.vercel.app",
+      "https://notes-app-gxt2-pr1wmtdxc-aleeza-amjads-projects.vercel.app",
     ],
     credentials: true,
   })
