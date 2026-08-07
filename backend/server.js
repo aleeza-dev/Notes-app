@@ -15,7 +15,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://notes-exsbepz2s-aleeza-amjads-projects.vercel.app",
-      "https://notes-app-iota-eight-43.vercel.app"
+      "https://notes-app-iota-eight-43.vercel.app",
     ],
     credentials: true,
   })
