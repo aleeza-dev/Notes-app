@@ -74,7 +74,7 @@ const Login = () => {
               try {
                 console.log("Google Response:", credentialResponse);
 
-                const res = await API.post("/auth/google", {
+                const res = await API.post("/api/auth/google", {
                   credential: credentialResponse.credential,
                 });
 
