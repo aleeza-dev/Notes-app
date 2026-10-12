@@ -3,17 +3,40 @@ import { useEffect, useState } from "react";
 import { toPng } from "html-to-image";
 import Navbar from "../components/Navbar";
 import NoteCard from "../components/NoteCard";
+import RichTextEditor from "../components/RichTextEditor";
 import API from "../services/api";
 import "./Dashboard.css";
 import "./NoteImage.css";
 
+const emptyContent = "";
+
+const escapeHtml = (text = "") =>
+  text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .split("\n")
+    .map((line) => `<p>${line || "<br>"}</p>`)
+    .join("");
+
 const Dashboard = () => {
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
+  const [content, setContent] = useState(emptyContent);
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("Personal");
+  const [tagsInput, setTagsInput] = useState("");
+  const [color, setColor] = useState("default");
+  const [isPinned, setIsPinned] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [editId, setEditId] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchNotes();
@@ -28,56 +51,122 @@ const Dashboard = () => {
     }
   };
 
+  const resetForm = () => {
+    setTitle("");
+    setContent("");
+    setDescription("");
+    setCategory("Personal");
+    setTagsInput("");
+    setColor("default");
+    setIsPinned(false);
+    setIsFavorite(false);
+    setEditId(null);
+  };
+
   const addNote = async () => {
     if (!title.trim() || !description.trim()) {
-      alert("Fill all fields");
+      alert("Please enter a title and note content.");
       return;
     }
 
+    const tags = [
+      ...new Set(
+        tagsInput
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+      ),
+    ];
+
+    const payload = {
+      title: title.trim(),
+      content,
+      description,
+      category,
+      tags,
+      color,
+      isPinned,
+      isFavorite,
+    };
+
+    setSaving(true);
+
     try {
       if (editId) {
-        await API.put(`/api/notes/${editId}`, {
-          title,
-          description,
-        });
-        setEditId(null);
+        await API.put(`/api/notes/${editId}`, payload);
       } else {
-        await API.post("/api/notes", {
-          title,
-          description,
-        });
+        await API.post("/api/notes", payload);
       }
 
-      setTitle("");
-      setDescription("");
+      resetForm();
       await fetchNotes();
     } catch (error) {
       console.error("Save Note Error:", error);
-      alert(error.response?.data?.message || "Could not save note");
+      alert(error.response?.data?.message || "Could not save note.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const deleteNote = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this note?")) {
+      return;
+    }
+
     try {
       await API.delete(`/api/notes/${id}`);
+      if (editId === id) resetForm();
       await fetchNotes();
     } catch (error) {
       console.error("Delete Note Error:", error);
-      alert("Could not delete note");
+      alert("Could not delete note.");
     }
   };
 
   const editNote = (note) => {
     setTitle(note.title || "");
+
+    // Old notes used plain text in description.
+    // Convert that text into safe paragraph HTML for the editor.
+    setContent(note.content || escapeHtml(note.description || ""));
     setDescription(note.description || "");
+    setCategory(note.category || "Personal");
+    setTagsInput((note.tags || []).join(", "));
+    setColor(note.color || "default");
+    setIsPinned(Boolean(note.isPinned));
+    setIsFavorite(Boolean(note.isFavorite));
     setEditId(note._id);
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const cancelEdit = () => {
-    setEditId(null);
-    setTitle("");
-    setDescription("");
+  const updateEditorContent = (html, text) => {
+    setContent(html);
+    setDescription(text);
+  };
+
+  const toggleNoteProperty = async (note, property) => {
+    try {
+      await API.put(`/api/notes/${note._id}`, {
+        [property]: !note[property],
+      });
+      await fetchNotes();
+   
+} catch (error) {
+  console.error("Update Note Error:", {
+    property,
+    message: error.message,
+    status: error.response?.status,
+    response: error.response?.data,
+    url: error.config?.url,
+  });
+
+  alert(
+    error.response?.data?.message ||
+    `Update failed. Status: ${error.response?.status || "Network error"}`
+  );
+}
+
   };
 
   const downloadNoteAsImage = async (note) => {
@@ -100,28 +189,28 @@ const Dashboard = () => {
     const divider = document.createElement("div");
     divider.className = "note-image-divider";
 
-    const content = document.createElement("div");
-    content.className = "note-image-content";
-    content.textContent = note.description || "";
+    const body = document.createElement("div");
+    body.className = "note-image-content";
+    body.textContent = note.description || "";
 
     const footer = document.createElement("div");
     footer.className = "note-image-footer";
     footer.textContent = "Saved with My Notes";
 
-    card.append(brand, heading, divider, content, footer);
+    card.append(brand, heading, divider, body, footer);
     element.appendChild(card);
 
-    // Keep the export element rendered for image capture.
-    element.style.position = "fixed";
-    element.style.left = "0";
-    element.style.top = "0";
-    element.style.zIndex = "-9999";
-    element.style.pointerEvents = "none";
+    Object.assign(element.style, {
+      position: "fixed",
+      left: "0",
+      top: "0",
+      zIndex: "-9999",
+      pointerEvents: "none",
+    });
 
     document.body.appendChild(element);
 
     try {
-      // Wait for the browser to finish laying out the export.
       await new Promise((resolve) =>
         requestAnimationFrame(() =>
           requestAnimationFrame(resolve)
@@ -136,7 +225,6 @@ const Dashboard = () => {
       });
 
       const link = document.createElement("a");
-
       const safeTitle = (note.title || "note")
         .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
         .trim()
@@ -144,7 +232,6 @@ const Dashboard = () => {
 
       link.download = `${safeTitle}.png`;
       link.href = dataUrl;
-
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -157,47 +244,164 @@ const Dashboard = () => {
     }
   };
 
-  const filteredNotes = notes.filter((note) =>
-    (note.title || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredNotes = notes
+    .filter((note) =>
+      `${note.title || ""} ${note.description || ""} ${(note.tags || []).join(" ")}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    )
+    .filter((note) =>
+      categoryFilter === "All"
+        ? true
+        : (note.category || "Personal") === categoryFilter
+    )
+    .filter((note) => (favoriteOnly ? note.isFavorite : true))
+    .sort((a, b) => Number(Boolean(b.isPinned)) - Number(Boolean(a.isPinned)));
+
+  const categories = [
+    "All",
+    "Personal",
+    "Work",
+    "Study",
+    ...new Set(notes.map((note) => note.category).filter(Boolean)),
+  ].filter((value, index, array) => array.indexOf(value) === index);
 
   return (
     <>
       <Navbar />
 
-      <div className="dashboard">
+      <main className="dashboard">
         <div className="top">
           <input
-            type="text"
-            placeholder="Search Note..."
+            type="search"
+            placeholder="Search titles, notes or tags..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="form">
+        <section className="form">
+          <h2>{editId ? "Edit Note" : "Create a Note"}</h2>
+
           <input
             type="text"
+            maxLength={200}
             placeholder="Note Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
 
-          <textarea
-            placeholder="Write your note..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+          <label className="editor-field-label">Note Content</label>
+          <RichTextEditor
+            value={content}
+            onChange={updateEditorContent}
           />
 
-          <button type="button" onClick={addNote}>
-            {editId ? "Update Note" : "Add Note"}
-          </button>
+          <div className="note-options-grid">
+            <label>
+              Category
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option>Personal</option>
+                <option>Work</option>
+                <option>Study</option>
+                <option>Ideas</option>
+                <option>Other</option>
+              </select>
+            </label>
 
-          {editId && (
-            <button type="button" onClick={cancelEdit}>
-              Cancel Edit
+            <label>
+              Note Color
+              <select
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+              >
+                <option value="default">Default</option>
+                <option value="yellow">Yellow</option>
+                <option value="pink">Pink</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="purple">Purple</option>
+              </select>
+            </label>
+          </div>
+
+          <label className="editor-field-label" htmlFor="note-tags">
+            Tags (comma separated)
+          </label>
+          <input
+            id="note-tags"
+            type="text"
+            placeholder="e.g. assignment, ideas, important"
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+          />
+
+          <div className="note-checkboxes">
+            <label>
+              <input
+                type="checkbox"
+                checked={isPinned}
+                onChange={(e) => setIsPinned(e.target.checked)}
+              />
+              Pin note
+            </label>
+
+            <label>
+              <input
+                type="checkbox"
+                checked={isFavorite}
+                onChange={(e) => setIsFavorite(e.target.checked)}
+              />
+              Add to favorites
+            </label>
+          </div>
+
+          <div className="editor-form-actions">
+            <button
+              type="button"
+              onClick={addNote}
+              disabled={saving}
+            >
+              {saving
+                ? "Saving..."
+                : editId
+                  ? "Update Note"
+                  : "Save Note"}
             </button>
-          )}
+
+            {editId && (
+              <button type="button" onClick={resetForm}>
+                Cancel Edit
+              </button>
+            )}
+          </div>
+        </section>
+
+        <div className="note-filters">
+          <label>
+            Category
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              {categories.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <button
+            type="button"
+            className={favoriteOnly ? "filter-active" : ""}
+            onClick={() => setFavoriteOnly((previous) => !previous)}
+          >
+            {favoriteOnly ? "★ Showing Favorites" : "☆ Favorites"}
+          </button>
         </div>
 
         <div className="notes">
@@ -207,6 +411,7 @@ const Dashboard = () => {
                 note={note}
                 deleteNote={deleteNote}
                 editNote={editNote}
+                toggleNoteProperty={toggleNoteProperty}
               />
 
               <button
@@ -224,11 +429,13 @@ const Dashboard = () => {
 
           {filteredNotes.length === 0 && (
             <p className="no-notes-message">
-              {search ? "No matching notes found." : "No notes yet. Add your first note!"}
+              {search || favoriteOnly || categoryFilter !== "All"
+                ? "No matching notes found."
+                : "No notes yet. Create your first note!"}
             </p>
           )}
         </div>
-      </div>
+      </main>
     </>
   );
 };

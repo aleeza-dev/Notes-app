@@ -1,0 +1,144 @@
+
+.rich-editor {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #e5d6c7;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.rich-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid #eadfd4;
+  background: #fffaf5;
+}
+
+.rich-editor-toolbar button {
+  min-width: 34px;
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #44372d;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.rich-editor-toolbar button:hover:not(:disabled),
+.rich-editor-toolbar button.active {
+  background: #f3dfc8;
+  border-color: #e8c9a8;
+}
+
+.rich-editor-toolbar button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.editor-toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #e4d7ca;
+  margin: 0 3px;
+}
+
+.rich-editor-loading {
+  padding: 20px;
+  color: #777;
+  border: 1px solid #e5d6c7;
+  border-radius: 10px;
+}
+
+.rich-editor-content {
+  min-height: 180px;
+  padding: 16px;
+  outline: none;
+  color: #292524;
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.rich-editor-content p {
+  margin: 0 0 10px;
+}
+
+.rich-editor-content h1 {
+  margin: 14px 0;
+  font-size: 27px;
+  line-height: 1.3;
+}
+
+.rich-editor-content h2 {
+  margin: 12px 0;
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.rich-editor-content h3 {
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+.rich-editor-content ul,
+.rich-editor-content ol {
+  padding-left: 26px;
+  margin: 10px 0;
+}
+
+.rich-editor-content blockquote {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 4px solid #e8b271;
+  background: #fff7ed;
+  color: #57534e;
+}
+
+.rich-editor-content pre {
+  padding: 12px;
+  border-radius: 8px;
+  background: #292524;
+  color: #fff;
+  overflow-x: auto;
+}
+
+.rich-editor-content code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #f5e9df;
+}
+
+.rich-editor-content a {
+  color: #b91c1c;
+  text-decoration: underline;
+}
+
+.rich-editor-content p.is-editor-empty:first-child::before {
+  color: #a8a29e;
+  content: "Write your note here...";
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .rich-editor-toolbar {
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .rich-editor-toolbar button {
+    padding: 6px 8px;
+  }
+
+  .rich-editor-content {
+    min-height: 150px;
+    padding: 12px;
+  }
+}
