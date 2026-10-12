@@ -14,7 +14,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <h2>𝑁𝑜𝑡𝑒𝑠 𝑎𝑝𝑝♡</h2>
+      <h2>𝑁♡𝑡𝑒𝑠</h2>
 
       {token ? (
         <button className="logout-btn" onClick={handleLogout}>
