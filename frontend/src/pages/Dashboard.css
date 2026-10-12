@@ -17,9 +17,9 @@
   width: 100%;
   min-width: 0;
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #bea55d;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.8);
+  background-color: rgba(201, 185, 185, 0.263);
   color: #292524;
   font: inherit;
 }
@@ -133,16 +133,16 @@
 
 .note-filters > button {
   padding: 11px 15px;
-  border: 1px solid #e5d6c7;
+  border: 1px solid #c79a6e;
   border-radius: 8px;
-  background: #fff;
+  background: #d9cbcb51;
   color: #57534e;
   cursor: pointer;
 }
 
 .note-filters > button.filter-active {
   background: #fff0f5;
-  border-color: #e9a9bc;
+  border-color: #ebbd79;
   color: #9f1239;
 }
 
@@ -186,4 +186,18 @@
   .note-filters label {
     width: 100%;
   }
+}
+.note-filters button {
+  background: transparent;
+  box-shadow: none;
+}
+
+.note-filters button:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
+.note-filters button.filter-active {
+  background: transparent;
+  box-shadow: none;
 }

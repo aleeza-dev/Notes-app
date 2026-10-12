@@ -4,7 +4,7 @@
   padding: 20px;
   border: 1px solid rgba(120, 100, 80, 0.12);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.212);
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
   overflow-wrap: anywhere;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -16,11 +16,11 @@
 }
 
 .note-color-default { background: #ffffff; }
-.note-color-yellow { background: #fff8d9; }
-.note-color-pink { background: #fff0f5; }
-.note-color-blue { background: #eaf4ff; }
-.note-color-green { background: #edfaef; }
-.note-color-purple { background: #f4edff; }
+.note-color-yellow { background: #f0d24c91; }
+.note-color-pink { background: #e1658e7a; }
+.note-color-blue { background: #75abe474; }
+.note-color-green { background: #65e4787e; }
+.note-color-purple { background: #8a68c08b; }
 
 .note-card-top {
   display: flex;
@@ -133,8 +133,8 @@
 }
 
 .delete-btn {
-  background: #f4d7dc;
-  color: #9f1239;
+  background: #c42c4595;
+  color: #f8f8f8;
 }
 
 .delete-btn:hover {
@@ -144,7 +144,7 @@
 .note-action-btn {
   background: rgba(255, 255, 255, 0.85);
   color: #57534e;
-  border: 1px solid #e7d9ca !important;
+  border: 1px solid #f0b16d !important;
 }
 
 @media (max-width: 480px) {
@@ -155,4 +155,15 @@
   .buttons button {
     padding: 8px 10px;
   }
+}
+/* Transparent background for Pin and Favourite buttons */
+.note-card .buttons .note-action-btn {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Keep background transparent on hover */
+.note-card .buttons .note-action-btn:hover {
+  background: transparent;
+  box-shadow: none;
 }

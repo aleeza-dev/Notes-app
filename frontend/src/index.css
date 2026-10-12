@@ -6,7 +6,7 @@ font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
-background-image: linear-gradient( rgba(200, 84, 148, 0.479),gray,#e8b271,gray,rgba(200, 84, 148, 0.479),gray,#e8b271);
+background-image: linear-gradient( rgba(200, 84, 148, 0.479),gray,#e8b271,rgba(200, 84, 148, 0.479),gray,#e8b271,rgba(200, 84, 148, 0.479),gray,#e8b271,rgba(200, 84, 148, 0.479),gray,#e8b271);
 }
 
 a{

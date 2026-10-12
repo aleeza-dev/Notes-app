@@ -4,7 +4,7 @@
   overflow: hidden;
   border: 1px solid #e5d6c7;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(201, 185, 185, 0.263);
 }
 
 .rich-editor-toolbar {
@@ -14,7 +14,7 @@
   gap: 6px;
   padding: 10px;
   border-bottom: 1px solid #eadfd4;
-  background: #fffaf5;
+  background:rgba(201, 185, 185, 0.263);
 }
 
 .rich-editor-toolbar button {
@@ -32,8 +32,8 @@
 
 .rich-editor-toolbar button:hover:not(:disabled),
 .rich-editor-toolbar button.active {
-  background: #f3dfc8;
-  border-color: #e8c9a8;
+  background: #f3c8cf;
+  border-color: #e8a8c5;
 }
 
 .rich-editor-toolbar button:disabled {
@@ -44,7 +44,7 @@
 .editor-toolbar-divider {
   width: 1px;
   height: 24px;
-  background: #e4d7ca;
+  background: #0d0202;
   margin: 0 3px;
 }
 
@@ -95,7 +95,7 @@
 .rich-editor-content blockquote {
   margin: 12px 0;
   padding: 10px 14px;
-  border-left: 4px solid #e8b271;
+  border-left: 4px solid #de9ca1;
   background: #fff7ed;
   color: #57534e;
 }
