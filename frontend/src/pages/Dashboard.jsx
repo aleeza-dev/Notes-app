@@ -169,80 +169,94 @@ const Dashboard = () => {
 
   };
 
-  const downloadNoteAsImage = async (note) => {
-    setDownloadingId(note._id);
+  
 
-    const element = document.createElement("div");
-    element.className = "note-image-export";
+const downloadNoteAsImage = async (note) => {
+  setDownloadingId(note._id);
 
-    const card = document.createElement("div");
-    card.className = "note-image-card";
+  const noteColors = {
+    default: "#fff1f2",
+    yellow: "#fef3c7",
+    pink: "#fce7f3",
+    blue: "#dbeafe",
+    green: "#dcfce7",
+    purple: "#ede9fe",
+  };
 
-    const brand = document.createElement("div");
-    brand.className = "note-image-brand";
-    brand.textContent = "✦ MY NOTES";
+  const exportColor = noteColors[note.color] || noteColors.default;
 
-    const heading = document.createElement("h1");
-    heading.className = "note-image-title";
-    heading.textContent = note.title || "Untitled Note";
+  const element = document.createElement("div");
+  element.className = "note-image-export";
 
-    const divider = document.createElement("div");
-    divider.className = "note-image-divider";
+  const card = document.createElement("div");
+  card.className = "note-image-card";
+  card.style.backgroundColor = exportColor;
 
-    const body = document.createElement("div");
-    body.className = "note-image-content";
-    body.textContent = note.description || "";
+  const brand = document.createElement("div");
+  brand.className = "note-image-brand";
+  brand.textContent = "✦ MY NOTES";
 
-    const footer = document.createElement("div");
-    footer.className = "note-image-footer";
-    footer.textContent = "Saved with My Notes";
+  const heading = document.createElement("h1");
+  heading.className = "note-image-title";
+  heading.textContent = note.title || "Untitled Note";
 
-    card.append(brand, heading, divider, body, footer);
-    element.appendChild(card);
+  const divider = document.createElement("div");
+  divider.className = "note-image-divider";
 
-    Object.assign(element.style, {
-      position: "fixed",
-      left: "0",
-      top: "0",
-      zIndex: "-9999",
-      pointerEvents: "none",
+  const body = document.createElement("div");
+  body.className = "note-image-content";
+  body.textContent = note.description || "";
+
+  const footer = document.createElement("div");
+  footer.className = "note-image-footer";
+  footer.textContent = "Saved with My Notes";
+
+  card.append(brand, heading, divider, body, footer);
+  element.appendChild(card);
+
+  Object.assign(element.style, {
+    position: "fixed",
+    left: "0",
+    top: "0",
+    zIndex: "-9999",
+    pointerEvents: "none",
+  });
+
+  document.body.appendChild(element);
+
+  try {
+    await new Promise((resolve) =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(resolve)
+      )
+    );
+
+    const dataUrl = await toPng(element, {
+      pixelRatio: 2,
+      backgroundColor: exportColor,
+      cacheBust: true,
+      skipFonts: true,
     });
 
-    document.body.appendChild(element);
+    const link = document.createElement("a");
+    const safeTitle = (note.title || "note")
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
+      .trim()
+      .slice(0, 100) || "note";
 
-    try {
-      await new Promise((resolve) =>
-        requestAnimationFrame(() =>
-          requestAnimationFrame(resolve)
-        )
-      );
-
-      const dataUrl = await toPng(element, {
-        pixelRatio: 2,
-        backgroundColor: "#fff1f2",
-        cacheBust: true,
-        skipFonts: true,
-      });
-
-      const link = document.createElement("a");
-      const safeTitle = (note.title || "note")
-        .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
-        .trim()
-        .slice(0, 100) || "note";
-
-      link.download = `${safeTitle}.png`;
-      link.href = dataUrl;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error("Image Download Error:", error);
-      alert("Could not download image. Please try again.");
-    } finally {
-      element.remove();
-      setDownloadingId(null);
-    }
-  };
+    link.download = `${safeTitle}.png`;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (error) {
+    console.error("Image Download Error:", error);
+    alert("Could not download image. Please try again.");
+  } finally {
+    element.remove();
+    setDownloadingId(null);
+  }
+};
 
   const filteredNotes = notes
     .filter((note) =>

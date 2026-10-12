@@ -2,7 +2,7 @@
 .rich-editor {
   width: 100%;
   overflow: hidden;
-  border: 1px solid #e5d6c7;
+  border: 1px solid #dea56d;
   border-radius: 10px;
   background: rgba(201, 185, 185, 0.263);
 }
@@ -13,7 +13,7 @@
   align-items: center;
   gap: 6px;
   padding: 10px;
-  border-bottom: 1px solid #eadfd4;
+  border-bottom: 1px solid #ce8e4f;
   background:rgba(201, 185, 185, 0.263);
 }
 
@@ -51,7 +51,7 @@
 .rich-editor-loading {
   padding: 20px;
   color: #777;
-  border: 1px solid #e5d6c7;
+  border: 1px solid #df9f5e;
   border-radius: 10px;
 }
 
@@ -95,7 +95,7 @@
 .rich-editor-content blockquote {
   margin: 12px 0;
   padding: 10px 14px;
-  border-left: 4px solid #de9ca1;
+  border-left: 4px solid #deaf5f;
   background: #fff7ed;
   color: #57534e;
 }

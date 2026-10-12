@@ -144,7 +144,7 @@
 .note-action-btn {
   background: rgba(255, 255, 255, 0.85);
   color: #57534e;
-  border: 1px solid #f0b16d !important;
+  border: 1px solid #e2a763 !important;
 }
 
 @media (max-width: 480px) {
